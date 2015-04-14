@@ -4,6 +4,11 @@
 #include <limits>
 
 #define SKIP_THRU_CHAR( s , x ) if ( s.good() ) s.ignore( std::numeric_limits<std::streamsize>::max(), x )
+#ifdef _WIN32
+#define SKIP_RETURN( s ) if ( s.good() && s.peek() == '\r' ) s.get();
+#else
+#define SKIP_RETURN ;
+#endif
 
 // private helper function - reads a .mtl file and adds to the material table
 bool ObjModel::loadMTL( std::string path, std::string filename )
@@ -24,6 +29,7 @@ bool ObjModel::loadMTL( std::string path, std::string filename )
 	ObjMtl material;
 	istream >> mat_name;
 	SKIP_THRU_CHAR( istream, '\n' );
+    SKIP_RETURN(istream);
 
 	while ( istream.good() && (istream.peek() != EOF) )
 	{
@@ -109,6 +115,7 @@ bool ObjModel::loadMTL( std::string path, std::string filename )
 		}
 		// ignore all other parameters, and move to next line after each property read
 		SKIP_THRU_CHAR( istream, '\n' );
+        SKIP_RETURN(istream);
 	}
 
 	// don't forget to save the last material
@@ -153,6 +160,7 @@ bool ObjModel::loadFromFile( std::string path, std::string filename )
 		if ( token == "#" ) // comment line
 		{
 			SKIP_THRU_CHAR( istream, '\n' );
+            SKIP_RETURN(istream);
 		}
 		else if ( token == "v" ) // vertex (position)
 		{
@@ -163,6 +171,7 @@ bool ObjModel::loadFromFile( std::string path, std::string filename )
 			vertices.push_back( glm::vec3( x, y, z ) );
 			// note: .obj supports a 'w' component, we're ignoring it here (it's very uncommon)
 			SKIP_THRU_CHAR( istream, '\n' );
+            SKIP_RETURN(istream);
 		}
 		else if ( token == "vt" ) // tex coord
 		{
@@ -172,6 +181,7 @@ bool ObjModel::loadFromFile( std::string path, std::string filename )
 			texcoords.push_back( glm::vec2( u, v ) );
 			// similarly, .obj supports 3D textures with a 'w' component
 			SKIP_THRU_CHAR( istream, '\n' );
+            SKIP_RETURN(istream);
 		}
 		else if ( token == "vn" ) // vertex normal
 		{
@@ -181,10 +191,12 @@ bool ObjModel::loadFromFile( std::string path, std::string filename )
 			istream >> z;
 			normals.push_back( glm::normalize( glm::vec3( x, y, z ) ) );
 			SKIP_THRU_CHAR( istream, '\n' );
+            SKIP_RETURN(istream);
 		}
 		else if ( token == "vp" ) // parameter space vertices, not supported
 		{
 			SKIP_THRU_CHAR( istream, '\n' );
+            SKIP_RETURN(istream);
 		}
 		else if ( token == "mtllib" )
 		{
@@ -195,6 +207,7 @@ bool ObjModel::loadFromFile( std::string path, std::string filename )
 				return false;
 			}
 			SKIP_THRU_CHAR( istream, '\n' );
+            SKIP_RETURN(istream);
 		}
 		else if ( token == "usemtl" )
 		{
@@ -206,6 +219,7 @@ bool ObjModel::loadFromFile( std::string path, std::string filename )
 			}
 			triangle.materialID = materialIDs[mtl];
 			SKIP_THRU_CHAR( istream, '\n' );
+            SKIP_RETURN(istream);
 		}
 		else if ( token == "g" ) // starts a new group of polygons
 		{
@@ -218,6 +232,7 @@ bool ObjModel::loadFromFile( std::string path, std::string filename )
 			// save the name of the group for debugging
 			istream >> group.name;
 			SKIP_THRU_CHAR( istream, '\n' );
+            SKIP_RETURN(istream);
 		}
 		else if ( token == "s" ) // smoothing group index
 		{
@@ -232,6 +247,7 @@ bool ObjModel::loadFromFile( std::string path, std::string filename )
 			// for triangles in the same group. don't worry about this early on, but you may
 			// need it for scenes like sponza where pre-computed normals are not provided
 			SKIP_THRU_CHAR( istream, '\n' );
+            SKIP_RETURN(istream);
 		}
 		else if ( token == "f" ) // a face, or polygon
 		{
@@ -255,10 +271,23 @@ bool ObjModel::loadFromFile( std::string path, std::string filename )
 					triangle.normals[0] = n - 1;
 
 					// read the remaining vertices
+                    int v1, v2, n1, n2;
+
+                    istream >> v1; istream.get(); istream.get(); istream >> n1;
+                    while (istream.peek() != '\n' && istream.peek() != '\r' && istream.peek() != EOF) {
+                        triangle.vertices[1] = v1 - 1; triangle.normals[1] = n1 - 1;
+                        istream >> v2; istream.get(); istream.get(); istream >> n2;
+                        triangle.vertices[2] = v2 - 1; triangle.normals[2] = n2 - 1;
+                        v1 = v2; n1 = n2;
+
+                        group.triangles.push_back(triangle);
+                    }
+                    /*
 					istream >> v; istream.get(); istream.get(); istream >> n;
 					triangle.vertices[1] = v - 1; triangle.normals[1] = n - 1;
 					istream >> v; istream.get(); istream.get(); istream >> n;
 					triangle.vertices[2] = v - 1; triangle.normals[2] = n - 1;
+                    */
 				}
 				else // single slash for texcoord
 				{
@@ -269,32 +298,64 @@ bool ObjModel::loadFromFile( std::string path, std::string filename )
 					if ( istream.peek() != '/' )
 					{
 						// no normals, just read remaining vertices
-						istream >> v; istream.get(); istream >> t;
-						triangle.vertices[1] = v - 1; triangle.texcoords[1] = t - 1;
-						istream >> v; istream.get(); istream >> t;
-						triangle.vertices[2] = v - 1; triangle.texcoords[2] = t - 1;
-					}
-					else
-					{
-						triangle.vertexType = Triangle::POSITION_TEXCOORD_NORMAL;
-						istream.get();
-						istream >> n;
-						triangle.normals[0] = n - 1;
 
-						istream >> v; istream.get(); istream >> t; istream.get(); istream >> n;
-						triangle.vertices[1] = v - 1; triangle.texcoords[1] = t - 1; triangle.normals[1] = n - 1;
-						istream >> v; istream.get(); istream >> t; istream.get(); istream >> n;
-						triangle.vertices[2] = v - 1; triangle.texcoords[2] = t - 1; triangle.normals[2] = n - 1;
+                        int v1, v2, t1, t2;
+
+						istream >> v1; istream.get(); istream >> t1;
+
+                        while (istream.peek() != '\n' && istream.peek() != '\r' && istream.peek() != EOF) {
+                            triangle.vertices[1] = v1 - 1; triangle.texcoords[1] = t1 - 1;
+                            istream >> v2; istream.get(); istream >> t2;
+                            triangle.vertices[2] = v2 - 1; triangle.texcoords[2] = t2 - 1;
+                            v1 = v2; t1 = t2;
+
+                            group.triangles.push_back(triangle);
+                        }
+					}
+                    else
+                    {
+                        triangle.vertexType = Triangle::POSITION_TEXCOORD_NORMAL;
+                        istream.get();
+                        istream >> n;
+                        triangle.normals[0] = n - 1;
+
+                        int v1, v2, t1, t2, n1, n2;
+
+                        istream >> v1; istream.get(); istream >> t1; istream.get(); istream >> n1;
+
+                        while (istream.peek() != '\n' && istream.peek() != '\r' && istream.peek() != EOF) {
+                            triangle.vertices[1] = v1 - 1; triangle.texcoords[1] = t1 - 1; triangle.normals[1] = n1 - 1;
+                            istream >> v2; istream.get(); istream >> t2; istream.get(); istream >> n2;
+                            triangle.vertices[2] = v2 - 1; triangle.texcoords[2] = t2 - 1; triangle.normals[2] = n2 - 1;
+                            v1 = v2; t1 = t2; n1 = n2;
+
+                            group.triangles.push_back(triangle);
+                        }
 					}
 				}
 			}
-			group.triangles.push_back( triangle );
+            else {
+                int v1, v2;
+
+                istream >> v1;
+                while (istream.peek() != '\n' && istream.peek() != '\r' && istream.peek() != EOF) {
+                    triangle.vertices[1] = v1 - 1;
+                    istream >> v2;
+                    triangle.vertices[2] = v2 - 1;
+                    v1 = v2;
+
+                    group.triangles.push_back(triangle);
+                }
+            }
+			//group.triangles.push_back( triangle );
 			SKIP_THRU_CHAR( istream, '\n' );
+            SKIP_RETURN(istream);
 		}
 		else
 		{
 			// ignore any other lines - invalid or unsupported obj content
 			SKIP_THRU_CHAR( istream, '\n' );
+            SKIP_RETURN(istream);
 		}
 		token.clear();
 	}
@@ -313,4 +374,20 @@ bool ObjModel::loadFromFile( std::string path, std::string filename )
 	}
 
 	return true;
+}
+
+const std::string ObjModel::getName() const {
+    return name;
+}
+const std::vector<glm::vec3> ObjModel::getVertices() const {
+    return vertices;
+}
+const std::vector<glm::vec2> ObjModel::getTexCoords() const {
+    return texcoords;
+}
+const std::vector<glm::vec3> ObjModel::getNormals() const {
+    return normals;
+}
+const std::vector<ObjModel::TriangleGroup> ObjModel::getGroups() const {
+    return groups;
 }

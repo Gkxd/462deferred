@@ -6,6 +6,7 @@
 class Camera {
 private:
 	glm::mat4 proj_mat;
+    glm::mat4 view_mat;
 
 	// change these to implement camera movement as you see fit
 	glm::vec3 eye_pos;

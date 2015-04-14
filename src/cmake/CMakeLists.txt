@@ -3,7 +3,7 @@
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR})
 
 # windows users - set the path to your sfml install here
-list(APPEND CMAKE_PREFIX_PATH "C:\\Program Files (x86)\\SFML-2.2")
+list(APPEND CMAKE_PREFIX_PATH "D:\\Daniel Hua\\Home\\CMU\\2015 Spring\\15-462\\hw\\04\\SFML-2.2")
 
 # this will make your code link against static sfml .lib's
 # the build time can be a little slower, but you won't have to copy dll's around to run the exe

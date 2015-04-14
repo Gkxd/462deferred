@@ -22,7 +22,11 @@ public:
 
 		// you may want to change this when you build meshes
 		const ObjModel * model;
-	};
+	
+        StaticModel() : scale(glm::vec3(1.0f, 1.0f, 1.0f))
+        {
+        };
+    };
 
 	struct DirectionalLight
 	{
@@ -70,6 +74,13 @@ private:
 public:
 	Scene();
 	bool loadFromFile( std::string filename );
+
+    const std::unordered_map<std::string, ObjModel> getObjModels() const;
+    const std::vector<StaticModel> getModels() const;
+    const DirectionalLight getSunlight() const;
+    const std::vector<SpotLight> getSpotlight() const;
+    const std::vector<PointLight> getPointlights() const;
+
 	~Scene();
 };
 

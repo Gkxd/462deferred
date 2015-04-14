@@ -10,6 +10,11 @@
  * Ignore the warnings about max() on Windows. They're lying, it compiles.
  */
 #define SKIP_THRU_CHAR( s , x ) if ( s.good() ) s.ignore( std::numeric_limits<std::streamsize>::max(), x )
+#ifdef _WIN32
+#define SKIP_RETURN( s ) if ( s.good() && s.peek() == '\r' ) s.get();
+#else
+#define SKIP_RETURN ;
+#endif
 
 Scene::Scene()
 {
@@ -39,12 +44,14 @@ bool Scene::loadFromFile( std::string filename )
 		// skip comment lines
 		if ( token == "#" )
 		{
-			SKIP_THRU_CHAR( istream, '\n' );
+            SKIP_THRU_CHAR(istream, '\n');
+            SKIP_RETURN(istream);
 		}
 		else if ( token == "sunlight" )
 		{
 			SKIP_THRU_CHAR( istream, '{' );
-			SKIP_THRU_CHAR( istream, '\n' );
+            SKIP_THRU_CHAR(istream, '\n');
+            SKIP_RETURN(istream);
 
 			// read in the sunlight parameters - override any previously seen values
 			while ( istream.good() && istream.peek() != '}' )
@@ -75,14 +82,17 @@ bool Scene::loadFromFile( std::string filename )
 					istream >> a;
 					sunlight.ambient = glm::clamp( a, 0.0f, 1.0f );
 				}
-				SKIP_THRU_CHAR( istream, '\n' );
+                SKIP_THRU_CHAR(istream, '\n');
+                SKIP_RETURN(istream);
 			}
-			SKIP_THRU_CHAR( istream, '\n' );
+            SKIP_THRU_CHAR(istream, '\n');
+            SKIP_RETURN(istream);
 		}
 		else if ( token == "spotlight" )
 		{
 			SKIP_THRU_CHAR( istream, '{' );
-			SKIP_THRU_CHAR( istream, '\n' );
+            SKIP_THRU_CHAR(istream, '\n');
+            SKIP_RETURN(istream);
 
 			SpotLight spotlight;
 			while ( istream.good( ) && istream.peek( ) != '}' )
@@ -137,15 +147,18 @@ bool Scene::loadFromFile( std::string filename )
 					istream >> spotlight.Kl;
 					istream >> spotlight.Kq;
 				}
-				SKIP_THRU_CHAR( istream, '\n' );
+                SKIP_THRU_CHAR(istream, '\n');
+                SKIP_RETURN(istream);
 			}
 			spotlights.push_back( spotlight );
-			SKIP_THRU_CHAR( istream, '\n' );			
+            SKIP_THRU_CHAR(istream, '\n');
+            SKIP_RETURN(istream);
 		}
 		else if ( token == "pointlight" )
 		{
 			SKIP_THRU_CHAR( istream, '{' );
-			SKIP_THRU_CHAR( istream, '\n' );
+            SKIP_THRU_CHAR(istream, '\n');
+            SKIP_RETURN(istream);
 
 			PointLight pointlight;
 			while ( istream.good( ) && istream.peek( ) != '}' )
@@ -182,15 +195,18 @@ bool Scene::loadFromFile( std::string filename )
 					istream >> pointlight.Kl;
 					istream >> pointlight.Kq;
 				}
-				SKIP_THRU_CHAR( istream, '\n' );
+                SKIP_THRU_CHAR(istream, '\n');
+                SKIP_RETURN(istream);
 			}
 			pointlights.push_back( pointlight );
-			SKIP_THRU_CHAR( istream, '\n' );
+            SKIP_THRU_CHAR(istream, '\n');
+            SKIP_RETURN(istream);
 		}
 		else if ( token == "model" )
 		{
 			SKIP_THRU_CHAR( istream, '{' );
-			SKIP_THRU_CHAR( istream, '\n' );
+            SKIP_THRU_CHAR(istream, '\n');
+            SKIP_RETURN(istream);
 
 			StaticModel model;
 			while ( istream.good( ) && istream.peek( ) != '}' )
@@ -234,10 +250,12 @@ bool Scene::loadFromFile( std::string filename )
 					}
 					model.model = &objmodels[token];
 				}
-				SKIP_THRU_CHAR( istream, '\n' );
+                SKIP_THRU_CHAR(istream, '\n');
+                SKIP_RETURN(istream);
 			}
 			models.push_back( model );
-			SKIP_THRU_CHAR( istream, '\n' );
+            SKIP_THRU_CHAR(istream, '\n');
+            SKIP_RETURN(istream);
 		}
 	}
 
@@ -252,4 +270,20 @@ bool Scene::loadFromFile( std::string filename )
 
 Scene::~Scene()
 {
+}
+
+const std::unordered_map<std::string, ObjModel> Scene::getObjModels() const {
+    return objmodels;
+}
+const std::vector<Scene::StaticModel> Scene::getModels() const {
+    return models;
+}
+const Scene::DirectionalLight Scene::getSunlight() const {
+    return sunlight;
+}
+const std::vector<Scene::SpotLight> Scene::getSpotlight() const {
+    return spotlights;
+}
+const std::vector<Scene::PointLight> Scene::getPointlights() const {
+    return pointlights;
 }

@@ -27,7 +27,7 @@ int main( int argc, char ** argv )
 	contextSettings.minorVersion = 0;
 
 	// create the window - you can change resolution, title, etc. here
-	sf::Window window(sf::VideoMode(1280, 720), "P4 Deferred Renderer", sf::Style::Default, contextSettings);
+	sf::Window window(sf::VideoMode(640, 480), "P4 Deferred Renderer", sf::Style::Default, contextSettings);
 	window.setVerticalSyncEnabled(true);
 
 
@@ -49,6 +49,7 @@ int main( int argc, char ** argv )
 	if ( !scene.loadFromFile( filename ) )
 	{
 		sf::err() << "FATAL ERROR: Failed to load scene file" << std::endl;
+        system("pause");
 		window.close();
 		return EXIT_FAILURE;
 	}
