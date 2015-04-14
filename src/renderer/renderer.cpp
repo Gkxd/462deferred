@@ -200,11 +200,11 @@ void Renderer::render( const Camera& camera, const Scene& scene ) {
 
             glm::vec3 eulerAngles = sm.orientation;
 
-            modelTransform = glm::scale(modelTransform, sm.scale);
-            modelTransform = glm::rotate(modelTransform, eulerAngles.x, glm::vec3(1, 0, 0)); //pitch
-            modelTransform = glm::rotate(modelTransform, eulerAngles.y, glm::vec3(0, 1, 0)); //yaw
-            modelTransform = glm::rotate(modelTransform, eulerAngles.z, glm::vec3(0, 0, 1)); //roll
             modelTransform = glm::translate(modelTransform, sm.position);
+            modelTransform = glm::rotate(modelTransform, glm::radians(eulerAngles.z), glm::vec3(0, 0, 1)); //roll
+            modelTransform = glm::rotate(modelTransform, glm::radians(eulerAngles.y), glm::vec3(0, 1, 0)); //yaw
+            modelTransform = glm::rotate(modelTransform, glm::radians(eulerAngles.x), glm::vec3(1, 0, 0)); //pitch
+            modelTransform = glm::scale(modelTransform, sm.scale);
 
             glm::mat4 mvpMat = cameraProj * cameraView * modelTransform;
             glm::mat4 normalMat = glm::transpose(glm::inverse(mvpMat));
