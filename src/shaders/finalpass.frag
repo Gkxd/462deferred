@@ -36,6 +36,7 @@ void main(){
     vec3 view = texture(viewTexture, UV).xyz;
     vec3 viewDir = normalize(-view);
     vec3 reflectedLight = normalize(-reflect(lightDirection, normal));
+    vec3 reflectedSpot = normalize(-reflect(spotDirection, normal));
     
     float attenuation = 1;
     if (lightDistance > 1) {
@@ -65,7 +66,10 @@ void main(){
     
     color = ambientColor * ambientLight;
     color += diffuseColor * lightColor * dot(normal, lightDirection) * attenuation * lightVisibility;
-    if (lightType == 2) { // Specular for point lights only
+    if (lightType == 1) {
+        color += specularColor * lightColor * pow(max(dot(viewDir, reflectedSpot), 0), specularExponent);
+    }
+    else {
         color += specularColor * lightColor * pow(max(dot(viewDir, reflectedLight), 0), specularExponent);
     }
     color *= clamp((40 - length(view)) / 10, 0, 1); // Depth fog

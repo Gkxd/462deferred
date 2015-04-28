@@ -276,8 +276,6 @@ void initShaders(std::string shaderPath) {
     }
     printf("Finished compiling material shader.\n\n");
 
-
-
     printf("Compiling final pass shader...\n\n");
     vertShader = loadVertexShader((shaderPath + "\\finalPass.vert").c_str());
     fragShader = loadFragmentShader((shaderPath + "\\finalPass.frag").c_str());
@@ -630,7 +628,7 @@ void Renderer::render(const Camera& camera, const Scene& scene) {
 
     Scene::DirectionalLight sunlight = scene.getSunlight();
 
-    glm::mat4 sunlightProj = glm::ortho(-10.0f, 10.0f, -10.0f, 30.0f, -10.0f, 50.0f);
+    glm::mat4 sunlightProj = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, -1.0f, 50.0f);
 
     Vec3 up = Vec3(0, 1, 0);
     if (1 - glm::abs(glm::dot(glm::normalize(sunlight.direction), up)) <= 0.01f) {
