@@ -253,14 +253,14 @@ public:
     Map<std::string, ModelInfo> meshMap;
 
 	// You may want to build some scene-specific OpenGL data before the first frame
-	bool initialize( const Camera& camera, const Scene& scene );
+	bool initialize(const Camera& camera, const Scene& scene, std::string shaderPath);
 
 	/*
 	 * Render a frame to the currently active OpenGL context.
 	 * It's best to keep all your OpenGL-specific data in the renderer; keep the Scene class clean.
 	 * This function should not modify the scene or camera.
 	 */
-	void render( const Camera& camera, const Scene& scene );
+	void render(const Camera& camera, const Scene& scene);
 
 	// release all OpenGL data and allocated memory
 	// you can do this in the destructor instead, but a callable function lets you swap scenes at runtime

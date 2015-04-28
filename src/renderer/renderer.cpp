@@ -149,15 +149,19 @@ GLint finalPass_cosHalfLightAngle; // For spotlights only
 GLint finalPass_spotlightFalloff; // For spotlights only
 GLint finalPass_normalMatrix;
 
-void initShaders() {
+void initShaders(std::string shaderPath) {
     // Loading shaders
 
     GLuint vertShader;
     GLuint fragShader;
 
+    //printf("%s\n", shaderPath.c_str);
+    std::cout << shaderPath << std::endl;
+
+
     printf("Compiling shadow map shader...\n\n");
-    vertShader = loadVertexShader("D:\\Daniel Hua\\Home\\CMU\\2015 Spring\\15-462\\hw\\04\\shaders\\shadowMap.vert");
-    fragShader = loadFragmentShader("D:\\Daniel Hua\\Home\\CMU\\2015 Spring\\15-462\\hw\\04\\shaders\\shadowMap.frag");
+    vertShader = loadVertexShader((shaderPath + "\\shadowMap.vert").c_str());
+    fragShader = loadFragmentShader((shaderPath + "\\shadowMap.frag").c_str());
 
     shadowMapShader = createShaderProgram(vertShader, fragShader);
     
@@ -172,8 +176,8 @@ void initShaders() {
     printf("Finished compiling shadow map shader.\n\n");
 
     printf("Compiling intermediate shader...\n\n");
-    vertShader = loadVertexShader("D:\\Daniel Hua\\Home\\CMU\\2015 Spring\\15-462\\hw\\04\\shaders\\intermediate.vert");
-    fragShader = loadFragmentShader("D:\\Daniel Hua\\Home\\CMU\\2015 Spring\\15-462\\hw\\04\\shaders\\intermediate.frag");
+    vertShader = loadVertexShader((shaderPath + "\\intermediate.vert").c_str());
+    fragShader = loadFragmentShader((shaderPath + "\\intermediate.frag").c_str());
 
     intermediateShader = createShaderProgram(vertShader, fragShader);
 
@@ -212,8 +216,8 @@ void initShaders() {
     printf("Finished compiling intermediate shader.\n\n");
 
     printf("Compiling material shader...\n\n");
-    vertShader = loadVertexShader("D:\\Daniel Hua\\Home\\CMU\\2015 Spring\\15-462\\hw\\04\\shaders\\material.vert");
-    fragShader = loadFragmentShader("D:\\Daniel Hua\\Home\\CMU\\2015 Spring\\15-462\\hw\\04\\shaders\\material.frag");
+    vertShader = loadVertexShader((shaderPath + "\\material.vert").c_str());
+    fragShader = loadFragmentShader((shaderPath + "\\material.frag").c_str());
 
     materialShader = createShaderProgram(vertShader, fragShader);
 
@@ -275,8 +279,8 @@ void initShaders() {
 
 
     printf("Compiling final pass shader...\n\n");
-    vertShader = loadVertexShader("D:\\Daniel Hua\\Home\\CMU\\2015 Spring\\15-462\\hw\\04\\shaders\\finalPass.vert");
-    fragShader = loadFragmentShader("D:\\Daniel Hua\\Home\\CMU\\2015 Spring\\15-462\\hw\\04\\shaders\\finalPass.frag");
+    vertShader = loadVertexShader((shaderPath + "\\finalPass.vert").c_str());
+    fragShader = loadFragmentShader((shaderPath + "\\finalPass.frag").c_str());
 
     finalPassShader = createShaderProgram(vertShader, fragShader);
 
@@ -379,7 +383,7 @@ glm::mat4 biasMatrix(
 // Clear color
 GLuint clearColor[3] = { 0, 0, 0 };
 
-bool Renderer::initialize( const Camera& camera, const Scene& scene )
+bool Renderer::initialize(const Camera& camera, const Scene& scene, std::string shaderPath)
 {
     // Initialize glew
     glewExperimental = TRUE;
@@ -389,7 +393,7 @@ bool Renderer::initialize( const Camera& camera, const Scene& scene )
         return false;
     }
 
-    initShaders();
+    initShaders(shaderPath);
 
     // Loading the models and VAOs
     const Vector<StaticModel> models = scene.getModels();

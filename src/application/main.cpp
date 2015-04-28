@@ -33,13 +33,15 @@ int main( int argc, char ** argv )
 
 	// load the scene data - this may take a while for large scenes
 	std::string filename;
-	if ( argc > 1 )
+    std::string shaderPath;
+	if ( argc > 2 )
 	{
-		filename = std::string( argv[argc - 1] );
+		filename = std::string(argv[argc - 2]);
+        shaderPath = std::string(argv[argc - 1]);
 	}
 	else
 	{
-		sf::err() << "Error: Missing argument string (must provide a scene file)." << std::endl;
+		sf::err() << "Error: Missing argument string (must provide a scene file and path to shaders)." << std::endl;
 		window.close();
 		return EXIT_FAILURE;
 	}
@@ -56,7 +58,7 @@ int main( int argc, char ** argv )
 
 	Camera camera;
 	Renderer renderer;
-	if ( !renderer.initialize( camera, scene ) )
+	if ( !renderer.initialize(camera, scene, shaderPath) )
 	{
 		sf::err() << "FATAL ERROR: Failed to initialize renderer" << std::endl;
 		window.close();
