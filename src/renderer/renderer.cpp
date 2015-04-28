@@ -526,7 +526,7 @@ bool Renderer::initialize( const Camera& camera, const Scene& scene )
 
     glGenTextures(1, &sunlightTexture);
     glBindTexture(GL_TEXTURE_2D, sunlightTexture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, SCREEN_WIDTH, SCREEN_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, SCREEN_WIDTH, SCREEN_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -538,7 +538,7 @@ bool Renderer::initialize( const Camera& camera, const Scene& scene )
     }
     for (int i = 0; i < numSpotlights; i++) {
         glBindTexture(GL_TEXTURE_2D, spotlightTextures[i]);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, SCREEN_WIDTH, SCREEN_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, SCREEN_WIDTH, SCREEN_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -552,7 +552,7 @@ bool Renderer::initialize( const Camera& camera, const Scene& scene )
     }
     for (int i = 0; i < numPointLights; i++) {
         glBindTexture(GL_TEXTURE_2D, pointlightTextures[i]);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, SCREEN_WIDTH, SCREEN_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA32F, SCREEN_WIDTH, SCREEN_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -626,7 +626,7 @@ void Renderer::render(const Camera& camera, const Scene& scene) {
 
     Scene::DirectionalLight sunlight = scene.getSunlight();
 
-    glm::mat4 sunlightProj = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, -1.0f, 50.0f);
+    glm::mat4 sunlightProj = glm::ortho(-10.0f, 10.0f, -10.0f, 30.0f, -10.0f, 50.0f);
 
     Vec3 up = Vec3(0, 1, 0);
     if (1 - glm::abs(glm::dot(glm::normalize(sunlight.direction), up)) <= 0.01f) {
