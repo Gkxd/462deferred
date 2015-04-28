@@ -25,30 +25,42 @@ Camera::~Camera()
 {
 }
 
+float ang = 180;
+
 void Camera::handleInput( float deltaTime )
 {
 	// adjust the camera position and orientation to account for movement over deltaTime seconds
 	// use sf::IsKeyPressed( sf::Keyboard::A ) to check if 'a' is currently pressed, etc
 
     if (Keyboard::isKeyPressed(Keyboard::W)) {
-        view_mat = glm::translate(view_mat, glm::vec3(0, 0, deltaTime));
+        eye_pos += view_dir * deltaTime;
     }
     if (Keyboard::isKeyPressed(Keyboard::A)) {
-        view_mat = glm::translate(view_mat, glm::vec3(deltaTime, 0, 0));
+        eye_pos -= glm::cross(view_dir, glm::vec3(0, 1, 0)) * deltaTime;
     }
     if (Keyboard::isKeyPressed(Keyboard::S)) {
-        view_mat = glm::translate(view_mat, glm::vec3(0, 0, -deltaTime));
+        eye_pos -= view_dir * deltaTime;
     }
     if (Keyboard::isKeyPressed(Keyboard::D)) {
-        view_mat = glm::translate(view_mat, glm::vec3(-deltaTime, 0, 0));
+        eye_pos += glm::cross(view_dir, glm::vec3(0, 1, 0)) * deltaTime;
     }
     if (Keyboard::isKeyPressed(Keyboard::LShift)) {
-        view_mat = glm::translate(view_mat, glm::vec3(0, deltaTime, 0));
+        eye_pos -= glm::vec3(0, deltaTime, 0);
     }
     if (Keyboard::isKeyPressed(Keyboard::Space)) {
-        view_mat = glm::translate(view_mat, glm::vec3(0, -deltaTime, 0));
+        eye_pos += glm::vec3(0, deltaTime, 0);
     }
 
+    if (Keyboard::isKeyPressed(Keyboard::Q)) {
+        ang += 15 * deltaTime;
+        view_dir = glm::vec3(glm::sin(glm::radians(ang)), 0, glm::cos(glm::radians(ang)));
+    }
+    if (Keyboard::isKeyPressed(Keyboard::E)) {
+        ang -= 15 * deltaTime;
+        view_dir = glm::vec3(glm::sin(glm::radians(ang)), 0, glm::cos(glm::radians(ang)));
+    }
+
+    view_mat = glm::lookAt(eye_pos, eye_pos + view_dir, up_dir);
 }
 
 // get a read-only handle to the projection matrix
@@ -61,4 +73,14 @@ glm::mat4 Camera::getViewMatrix() const
 {
 	// construct and return a view matrix from your position representation
 	return view_mat;
+}
+
+glm::vec3 Camera::getEye() const {
+    return eye_pos;
+}
+glm::vec3 Camera::getDirection() const {
+    return view_dir;
+}
+glm::vec3 Camera::getUp() const {
+    return up_dir;
 }

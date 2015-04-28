@@ -23,9 +23,9 @@ public:
 		int map_Kd;
 		int map_Ka;
 
-		ObjMtl() : Ka( glm::vec3( 0.0f, 0.0f, 0.0f ) ),
-				   Kd( glm::vec3( 0.0f, 0.0f, 0.0f ) ),
-				   Ks( glm::vec3( 0.0f, 0.0f, 0.0f ) ),
+		ObjMtl() : Ka( glm::vec3( 1.0f, 1.0f, 1.0f ) ),
+				   Kd( glm::vec3( 1.0f, 1.0f, 1.0f ) ),
+				   Ks( glm::vec3( 1.0f, 1.0f, 1.0f ) ),
 				   Ns( 0.0f ),
 				   map_Kd( -1 ),
 				   map_Ka( -1 )
@@ -70,6 +70,9 @@ public:
     const std::vector<glm::vec3> getNormals() const;
 
     const std::vector<TriangleGroup> getGroups() const;
+    const int numTextures() const;
+    const sf::Image getTexture(int i) const;
+    const ObjMtl getMaterial(int i) const;
 
 private:
 	std::string name;

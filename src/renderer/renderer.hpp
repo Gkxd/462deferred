@@ -15,6 +15,9 @@
 #define TriangleGroup ObjModel::TriangleGroup
 #define Triangle ObjModel::Triangle
 
+#define SCREEN_WIDTH 640
+#define SCREEN_HEIGHT 480
+
 class Renderer {
 public:
 
@@ -73,9 +76,13 @@ public:
         // I only support meshes that have one vertex type per triangle group
         Triangle::VertexType vType;
 
+        // I only support meshes that have one material per triangle group
+        ObjModel::ObjMtl material;
+
         unsigned int vertexBuffer;
         unsigned int normalBuffer;
         unsigned int texCoordBuffer;
+        unsigned int indexBuffer;
 
         unsigned int vao;
 
@@ -113,7 +120,16 @@ public:
 
             vType = triangles[0].vertexType;
 
+            material = obj.getMaterial(triangles[0].materialID);
+
+            printf("Number of triangles in group: %d\n", triangles.size());
+            int triangleCount = 0;
+
             for (Triangle t : triangles) {
+                if (++triangleCount % 5000 == 0) {
+                    printf("Processing triangle %d / %d\n", triangleCount, triangles.size());
+                }
+
                 if (t.vertexType != vType) {
                     printf("Warning: Must have one type of vertex per triangle group! Skipping this triangle...\n");
                     continue;
@@ -218,9 +234,13 @@ public:
     struct ModelInfo {
         Vector<SubMesh> submeshes;
 
+        Vector<unsigned int> textures;
+
         ModelInfo(StaticModel sm) {
             ObjModel obj = *sm.model;
             Vector<TriangleGroup> triangleGroups = obj.getGroups();
+
+            textures = Vector<unsigned int>(obj.numTextures());
 
             for (TriangleGroup tg : triangleGroups) {
                 SubMesh submesh = SubMesh(tg, obj);

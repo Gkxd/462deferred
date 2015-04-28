@@ -36,13 +36,15 @@ public:
 	};
 
 	struct SpotLight
-	{
+    {
+        glm::vec3 initialPosition;
 		glm::vec3 position;
 		glm::vec3 direction;
 		glm::vec3 color;
 		float exponent;
 		float angle;
-		float length;
+        float length;
+        float velocity;
 		float Kc, Kl, Kq; // attenuation constants
 
 		SpotLight() : position( glm::vec3( 0.0f, 0.0f, 0.0f ) ),
@@ -51,6 +53,7 @@ public:
 			          exponent( 0.0f ),
 			          angle( 0.0f ),
 			          length( 0.0f ),
+                      velocity( 0.0f ),
 			          Kc( 0.0f ), Kl( 0.0f ), Kq( 0.0f )
 		{
 		};
@@ -58,6 +61,7 @@ public:
 
 	struct PointLight
 	{
+        glm::vec3 initialPosition;
 		glm::vec3 position;
 		glm::vec3 color;
 		float velocity;
@@ -78,8 +82,10 @@ public:
     const std::unordered_map<std::string, ObjModel> getObjModels() const;
     const std::vector<StaticModel> getModels() const;
     const DirectionalLight getSunlight() const;
-    const std::vector<SpotLight> getSpotlight() const;
+    const std::vector<SpotLight> getSpotlights() const;
     const std::vector<PointLight> getPointlights() const;
+
+    void update(float deltaTime);
 
 	~Scene();
 };

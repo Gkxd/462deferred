@@ -104,8 +104,9 @@ bool Scene::loadFromFile( std::string filename )
 					float x, y, z;
 					istream >> x;
 					istream >> y;
-					istream >> z;
-					spotlight.position = glm::vec3( x, y, z );
+                    istream >> z;
+                    spotlight.position = glm::vec3(x, y, z);
+					spotlight.initialPosition = glm::vec3(x, y, z);
 				}
 				else if ( token == "direction" )
 				{
@@ -141,6 +142,11 @@ bool Scene::loadFromFile( std::string filename )
 					istream >> l;
 					spotlight.length = glm::max( l, 0.0f );
 				}
+                else if (token == "velocity") {
+                    float v;
+                    istream >> v;
+                    spotlight.velocity = v;
+                }
 				else if ( token == "attenuation" )
 				{
 					istream >> spotlight.Kc;
@@ -170,8 +176,9 @@ bool Scene::loadFromFile( std::string filename )
 					float x, y, z;
 					istream >> x;
 					istream >> y;
-					istream >> z;
-					pointlight.position = glm::vec3( x, y, z );
+                    istream >> z;
+                    pointlight.position = glm::vec3(x, y, z);
+					pointlight.initialPosition = glm::vec3( x, y, z );
 				}
 				else if ( token == "color" )
 				{
@@ -187,7 +194,7 @@ bool Scene::loadFromFile( std::string filename )
 				{
 					float v;
 					istream >> v;
-					pointlight.velocity = glm::clamp( v, 0.0f, 1.0f );
+					pointlight.velocity = v;
 				}
 				else if ( token == "attenuation" )
 				{
@@ -281,9 +288,34 @@ const std::vector<Scene::StaticModel> Scene::getModels() const {
 const Scene::DirectionalLight Scene::getSunlight() const {
     return sunlight;
 }
-const std::vector<Scene::SpotLight> Scene::getSpotlight() const {
+const std::vector<Scene::SpotLight> Scene::getSpotlights() const {
     return spotlights;
 }
 const std::vector<Scene::PointLight> Scene::getPointlights() const {
     return pointlights;
+}
+
+float totalTime;
+void Scene::update(float deltaTime) {
+    for (int i = 0; i < pointlights.size(); i++) {
+        Scene::PointLight p = pointlights[i];
+
+        if (p.velocity > 0) {
+
+            p.position = p.initialPosition + 5.0f * glm::vec3(glm::sin(totalTime * p.velocity), 0, glm::cos(totalTime * p.velocity));
+
+            pointlights[i] = p;
+        }
+    }
+
+    for (int i = 0; i < spotlights.size(); i++) {
+        Scene::SpotLight s = spotlights[i];
+
+        if (s.velocity > 0) {
+            s.direction = glm::vec3(glm::sin(totalTime * s.velocity), -2.0f, glm::cos(totalTime * s.velocity));
+            s.position = s.initialPosition + glm::vec3(glm::sin(totalTime * -s.velocity), 0, glm::cos(totalTime * -s.velocity));
+            spotlights[i] = s;
+        }
+    }
+    totalTime += deltaTime;
 }

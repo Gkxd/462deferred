@@ -21,6 +21,11 @@ public:
 
 	const glm::mat4& getProjectionMatrix() const;
 	glm::mat4 getViewMatrix() const;
+
+    glm::vec3 getEye() const;
+    glm::vec3 getDirection() const;
+    glm::vec3 getUp() const;
+
 	void handleInput( float deltaTime );
 };
 

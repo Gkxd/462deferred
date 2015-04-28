@@ -27,7 +27,7 @@ int main( int argc, char ** argv )
 	contextSettings.minorVersion = 0;
 
 	// create the window - you can change resolution, title, etc. here
-	sf::Window window(sf::VideoMode(640, 480), "P4 Deferred Renderer", sf::Style::Default, contextSettings);
+	sf::Window window(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "P4 Deferred Renderer", sf::Style::Default, contextSettings);
 	window.setVerticalSyncEnabled(true);
 
 
@@ -103,7 +103,9 @@ int main( int argc, char ** argv )
 		}
 
 		// update the camera position and orientation
-		camera.handleInput( clock.restart().asSeconds() );
+        float deltaTime = clock.restart().asSeconds();
+		camera.handleInput(deltaTime);
+        scene.update(deltaTime);
 
 		renderer.render( camera, scene );
 

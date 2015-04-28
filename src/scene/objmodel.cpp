@@ -128,6 +128,9 @@ bool ObjModel::loadMTL( std::string path, std::string filename )
  * Parses an input .obj file, loading data into memory.
  * This does not cover the entire .obj spec, just the most common cases, namely v/t/n triangles.
  * You will need to perform additional processing to generate meshes from the vectors of raw data.
+ *
+ * Known issues:
+ * -Lines in an .obj file must not have trailing whitespace
  */
 bool ObjModel::loadFromFile( std::string path, std::string filename )
 {
@@ -347,6 +350,7 @@ bool ObjModel::loadFromFile( std::string path, std::string filename )
                     group.triangles.push_back(triangle);
                 }
             }
+
 			//group.triangles.push_back( triangle );
 			SKIP_THRU_CHAR( istream, '\n' );
             SKIP_RETURN(istream);
@@ -390,4 +394,13 @@ const std::vector<glm::vec3> ObjModel::getNormals() const {
 }
 const std::vector<ObjModel::TriangleGroup> ObjModel::getGroups() const {
     return groups;
+}
+const int ObjModel::numTextures() const {
+    return textures.size();
+}
+const sf::Image ObjModel::getTexture(int i) const {
+    return textures[i];
+}
+const ObjModel::ObjMtl ObjModel::getMaterial(int i) const {
+    return materials[i];
 }
