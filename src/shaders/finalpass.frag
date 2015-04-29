@@ -72,5 +72,5 @@ void main(){
     else {
         color += specularColor * lightColor * pow(max(dot(viewDir, reflectedLight), 0), specularExponent);
     }
-    color *= clamp((40 - length(view)) / 10, 0, 1); // Depth fog
+    //color *= clamp((40 - length(view)) / 10, 0, 1); // Depth fog
 }

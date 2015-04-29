@@ -122,6 +122,7 @@ GLuint materialShader;
 GLint materialShader_cameraMVPMat;
 GLint materialShader_cameraMVMat;
 GLint materialShader_normalMat;
+GLint materialShader_useTextures;
 GLint materialShader_ambientTexture;
 GLint materialShader_hasAmbientTexture;
 GLint materialShader_diffuseTexture;
@@ -245,6 +246,10 @@ void initShaders(std::string shaderPath) {
     materialShader_ambientTexture = glGetUniformLocation(materialShader, "ambientTexture");
     if (materialShader_ambientTexture == -1) {
         printf("Could not find ambientTexture\n\n");
+    }
+    materialShader_useTextures = glGetUniformLocation(materialShader, "useTextures");
+    if (materialShader_useTextures == -1) {
+        printf("Could not find useTextures\n\n");
     }
     materialShader_hasAmbientTexture = glGetUniformLocation(materialShader, "hasAmbientTexture");
     if (materialShader_hasAmbientTexture == -1) {
@@ -461,6 +466,30 @@ bool Renderer::initialize(const Camera& camera, const Scene& scene, std::string 
         }
         else {
             std::cout << "Skipping " << sm.model->getName() << std::endl;
+        }
+    }
+
+    for (StaticModel sm : models) {
+        auto iter = meshMap.find(sm.model->getName());
+
+        std::cout << "Checking " << sm.model->getName() << std::endl;
+        if (iter != meshMap.end()) {
+            ModelInfo mesh = iter->second;
+            /*
+            for (SubMesh submesh : mesh.submeshes) {
+                switch (submesh.vType) {
+                case Triangle::VertexType::POSITION_TEXCOORD_NORMAL:
+                case Triangle::VertexType::POSITION_TEXCOORD:
+
+                    printf("Array sizes: %d, %d, %d\n")
+
+                    break;
+                default:
+                }
+            }*/
+        }
+        else {
+            std::cout << "Could not find " << sm.model->getName() << std::endl;
         }
     }
 
@@ -876,6 +905,8 @@ void Renderer::render(const Camera& camera, const Scene& scene) {
     };
     glDrawBuffers(6, buffers);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glUniform1i(materialShader_useTextures, camera.toggle1);
 
     for (StaticModel sm : models) {
         auto iter = meshMap.find(sm.model->getName());

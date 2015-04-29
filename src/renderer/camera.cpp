@@ -4,6 +4,7 @@
 #include <SFML/Window.hpp>
 
 #define Keyboard sf::Keyboard
+#define TOGGLE_DELAY 100
 
 Camera::Camera() : eye_pos( glm::vec3( 0.0f, 0.0f, 0.0f ) ),
 				   view_dir( glm::vec3( 0.0f, 0.0f, -1.0f ) ),
@@ -26,6 +27,7 @@ Camera::~Camera()
 }
 
 float ang = 180;
+int delayCounter;
 
 void Camera::handleInput( float deltaTime )
 {
@@ -58,6 +60,17 @@ void Camera::handleInput( float deltaTime )
     if (Keyboard::isKeyPressed(Keyboard::E)) {
         ang -= 15 * deltaTime;
         view_dir = glm::vec3(glm::sin(glm::radians(ang)), 0, glm::cos(glm::radians(ang)));
+    }
+
+    if (Keyboard::isKeyPressed(Keyboard::T)) {
+        if (delayCounter <= 0) {
+            toggle1 = !toggle1;
+            delayCounter = TOGGLE_DELAY;
+        }
+    }
+
+    if (delayCounter > 0) {
+        delayCounter--;
     }
 
     view_mat = glm::lookAt(eye_pos, eye_pos + view_dir, up_dir);

@@ -11,10 +11,12 @@ layout(location = 3) out vec3 specular;
 layout(location = 4) out float specularEx;
 layout(location = 5) out vec3 view;
 
+uniform bool useTextures;
 uniform bool hasAmbientTexture;
 uniform sampler2D ambientTexture;
 uniform bool hasDiffuseTexture;
 uniform sampler2D diffuseTexture;
+
 
 uniform vec3 ambientColor;
 uniform vec3 diffuseColor;
@@ -24,15 +26,15 @@ uniform float specularExponent;
 void main() {
     normal = interpolated_Normal;
     
-    if (hasAmbientTexture) {
-        ambient = ambientColor;// * texture(ambientTexture, interpolated_TexCoord).rgb;
+    if (hasAmbientTexture && useTextures) {
+        ambient = ambientColor * texture(ambientTexture, interpolated_TexCoord).rgb;
     }
     else {
         ambient = ambientColor;
     }
     
-    if (hasDiffuseTexture) {
-        diffuse = diffuseColor;// * texture(diffuseTexture, interpolated_TexCoord).rgb;
+    if (hasDiffuseTexture && useTextures) {
+        diffuse = diffuseColor * texture(diffuseTexture, interpolated_TexCoord).rgb;
     }
     else {
         diffuse = diffuseColor;

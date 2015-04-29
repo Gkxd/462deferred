@@ -27,6 +27,7 @@ public:
     glm::vec3 getUp() const;
 
 	void handleInput( float deltaTime );
+    bool toggle1;
 };
 
 #endif // #ifndef _CAMERA_H_
