@@ -25,10 +25,22 @@ vec2 poissonDisk[5] = vec2[](
 void main() {
     if (lightType == 0) { // Directional Light
         float visibility = 1;
-        vec2 UV = interpolated_ShadowCoord.xy/interpolated_ShadowCoord.w;
-        if (texture(shadowMap, UV).z < (interpolated_ShadowCoord.z - 0.0015)/interpolated_ShadowCoord.w) {
+        vec2 UV = interpolated_ShadowCoord.xy;
+        
+        if (texture(shadowMap, UV).z < (interpolated_ShadowCoord.z - 0.0015)) {
             visibility = 0;
         }
+        
+        /*
+        for (int i = 0; i < 5; i++) {
+            float shadowDistance = interpolated_ShadowCoord.z/interpolated_ShadowCoord.w;
+            float adjustment = clamp(shadowDistance * shadowDistance * 600, 0, 699);
+            vec2 UV = (interpolated_ShadowCoord.xy + poissonDisk[i]/(700 - adjustment))/interpolated_ShadowCoord.w;
+            if (texture(shadowMap, UV).z < (interpolated_ShadowCoord.z - 0.0015)/interpolated_ShadowCoord.w) {
+                visibility -= 0.2;
+            }
+        }
+        */
         
         if (UV.x > 1 || UV.y > 1 || UV.x < 0 || UV.y < 0) {
             visibility = 1;
@@ -38,7 +50,9 @@ void main() {
     else if (lightType == 1) { // Spotlight
         float visibility = 1;
         for (int i = 0; i < 5; i++) {
-            vec2 UV = (interpolated_ShadowCoord.xy + poissonDisk[i]/700)/interpolated_ShadowCoord.w;
+            float shadowDistance = interpolated_ShadowCoord.z/interpolated_ShadowCoord.w;
+            float adjustment = clamp(shadowDistance * shadowDistance * 600, 0, 699);
+            vec2 UV = (interpolated_ShadowCoord.xy + poissonDisk[i]/(700 - adjustment))/interpolated_ShadowCoord.w;
             if (texture(shadowMap, UV).z < (interpolated_ShadowCoord.z - 0.0015)/interpolated_ShadowCoord.w) {
                 visibility -= 0.2;
             }

@@ -475,21 +475,28 @@ bool Renderer::initialize(const Camera& camera, const Scene& scene, std::string 
         std::cout << "Checking " << sm.model->getName() << std::endl;
         if (iter != meshMap.end()) {
             ModelInfo mesh = iter->second;
-            /*
+            
             for (SubMesh submesh : mesh.submeshes) {
                 switch (submesh.vType) {
                 case Triangle::VertexType::POSITION_TEXCOORD_NORMAL:
                 case Triangle::VertexType::POSITION_TEXCOORD:
 
-                    printf("Array sizes: %d, %d, %d\n")
+                    printf("Array sizes: %d, %d, %d\n", submesh.vertexArray.size(), submesh.normalArray.size(), submesh.texCoordArray.size());
+
+                    for (int i = 0; i < submesh.vertexArray.size(); i++) {
+                        printf("Texcoord: %f, %f\n", submesh.texCoordArray[i].u, submesh.texCoordArray[i].v);
+                    }
 
                     break;
                 default:
+                    printf("Array sizes (no tex coords): %d, %d\n", submesh.vertexArray.size(), submesh.normalArray.size());
                 }
-            }*/
+            }
+
+            printf("\n");
         }
         else {
-            std::cout << "Could not find " << sm.model->getName() << std::endl;
+            std::cout << "Could not find " << sm.model->getName() << std::endl << std::endl;
         }
     }
 
